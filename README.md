@@ -25,26 +25,18 @@
 
 # API Usage
 
-1. Generate API Key:
+- For requests to endpoints under the `api/v1/secured` prefix, you need to include the token in the Authorization header using the Bearer authentication method.
 
-    - Start your Laravel server:
-        ```
-        php artisan serve
-        ```
-    - Make a POST request to `http://127.0.0.1:8000/api/generateApiKey` to generate an API key.
+- After logging in, the server will respond with a token. Copy this token.
 
-2. Set API Key:
-
-    - Once you receive the API key, paste it into the `.env` file under `API_KEY=`.
-
-3. Using the API:
-    - For every request to the API, include a header named `x-api-key` with the value set to the generated API key.
+- For every request to the secured API endpoints, include a header named `Authorization` with the value set to `Bearer YOUR_TOKEN`, where `YOUR_TOKEN` is the token received after login.
 
 ## Example
 
 Here's how you can use the API with cURL:
 
 ```bash
-curl -X GET http://127.0.0.1:8000/api/endpoint \
--H "x-api-key: YOUR_API_KEY"
+curl -X GET http://127.0.0.1:8000/api/v1/secured/endpoint \
+-H "Authorization: Bearer YOUR_TOKEN"
+
 ```
