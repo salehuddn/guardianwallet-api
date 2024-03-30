@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +21,16 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1')->middleware('api_key')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    // Route::post('/register', [AuthController::class, 'register']);
+    // Route::post('/login', [AuthController::class, 'login']);
     Route::post('/deleteUser', [AuthController::class, 'deleteUser']);
 });
 
 Route::post('/generateApiKey', [AuthController::class, 'generateApiKey']);
+
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
+    Route::get('/user-profile', [UserProfileController::class, 'userProfile']);
+});
