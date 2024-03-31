@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\Adult;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,14 +17,16 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:8',
-            'phone' => 'nullable|string|unique:users',
+            'phone_number' => 'nullable|string|unique:users,phone',
+            'date_of_birth' => ['required', 'date', new Adult]
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone,
+            'phone' => $request->phone_number,
+            'dob' => $request->date_of_birth
         ]);
 
         $user->assignRole('guardian');
@@ -43,7 +46,9 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('GuardianWallet')->plainTextToken;
 
-            return response()->json(['token' => $token], 200);
+            return response()->json([
+                'token' => $token
+            ], 200);
         }
 
         return response()->json([
