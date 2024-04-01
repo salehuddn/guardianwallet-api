@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DependantController;
+use App\Http\Controllers\GuardianController;
 use App\Http\Controllers\UserProfileController;
 
 /*
@@ -33,6 +35,15 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
-    Route::get('/user-profile', [UserProfileController::class, 'userProfile']);
+Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {  
+    //guardian
+    Route::prefix('guardian')->group(function () {
+        Route::get('profile', [GuardianController::class, 'guardianProfile']);
+        Route::post('create-dependant', [GuardianController::class, 'registerDependant']);
+    });
+
+    //dependent
+    Route::prefix('dependent')->group(function () {
+        Route::get('/profile', [DependantController::class, 'dependentProfile']);
+    });
 });

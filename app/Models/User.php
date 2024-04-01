@@ -52,8 +52,8 @@ class User extends Authenticatable
         'roles'
     ];
 
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(Role::class);
-    // }
+    public function dependants()
+    {
+        return $this->belongsToMany(User::class, 'dependant_guardian', 'guardian_id', 'dependant_id');
+    }
 }

@@ -15,6 +15,7 @@ class UserProfileController extends Controller
 
         if ($user) {
             return response()->json([
+                'code' => 200,
                 'user' => $user
             ], 200);
         } else {
