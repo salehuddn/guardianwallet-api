@@ -22,20 +22,24 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('v1')->middleware('api_key')->group(function () {
-    // Route::post('/register', [AuthController::class, 'register']);
-    // Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/deleteUser', [AuthController::class, 'deleteUser']);
-});
+// Route::prefix('v1')->middleware('api_key')->group(function () {
+//     // Route::post('/register', [AuthController::class, 'register']);
+//     // Route::post('/login', [AuthController::class, 'login']);
+//     Route::post('/deleteUser', [AuthController::class, 'deleteUser']);
+// });
 
 Route::post('/generateApiKey', [AuthController::class, 'generateApiKey']);
 
 Route::prefix('v1')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('deleteUser', [AuthController::class, 'deleteUser']);
 });
 
 Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {  
+    //auth
+    Route::post('logout', [AuthController::class, 'logout']);
+    
     //guardian
     Route::prefix('guardian')->group(function () {
         Route::get('profile', [GuardianController::class, 'guardianProfile']);

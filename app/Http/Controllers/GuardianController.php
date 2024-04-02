@@ -25,13 +25,11 @@ class GuardianController extends Controller
                 return response()->json([
                     'code' => 200,
                     'user' => $guardian,
-                    'dependants' => $guardian->dependants
                 ], 200);
             } else {
                 return response()->json([
                     'code' => 200,
                     'user' => $guardian,
-                    'dependants' => []
                 ], 200);
             }
         } else {

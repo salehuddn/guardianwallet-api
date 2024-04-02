@@ -76,6 +76,16 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'User logged out successfully'
+        ], 200);
+    }
+
     public function generateApiKey()
     {
         $apiKey = Str::random(60);
