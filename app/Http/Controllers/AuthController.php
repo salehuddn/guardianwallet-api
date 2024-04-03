@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Rules\Adult;
 use Illuminate\Support\Str;
@@ -11,16 +12,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'phone_number' => 'nullable|string|unique:users,phone',
-            'date_of_birth' => ['required', 'date', new Adult()]
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
