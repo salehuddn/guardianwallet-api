@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use App\Rules\Adult;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class RegisterRequest extends FormRequest
 {
@@ -12,7 +14,7 @@ class RegisterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,5 +31,14 @@ class RegisterRequest extends FormRequest
             'phone_number' => ['nullable', 'string', 'unique:users,phone'],
             'date_of_birth' => ['required', 'date', new Adult()]
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'code' => 422,
+            'message' => 'Validation errors',
+            'data' => $validator->errors()
+        ], 422));
     }
 }
