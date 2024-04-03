@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterDependantRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -49,15 +50,8 @@ class GuardianController extends Controller
         ], 200);
     }
 
-    public function registerDependant(Request $request)
+    public function registerDependant(RegisterDependantRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:8',
-            'date_of_birth' => ['required', 'date']
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
