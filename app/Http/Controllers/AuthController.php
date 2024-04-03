@@ -15,10 +15,10 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
+            'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:8',
             'phone_number' => 'nullable|string|unique:users,phone',
-            'date_of_birth' => ['required', 'date', new Adult]
+            'date_of_birth' => ['required', 'date', new Adult()]
         ]);
 
         $user = User::create([
