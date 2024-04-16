@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Rules\Adult;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Mail\VerificationEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
 {
@@ -24,6 +26,8 @@ class AuthController extends Controller
 
         $user->assignRole('guardian');
         $user->save();
+
+        // Mail::to($user->email)->send(new VerificationEmail($user));
 
         return response()->json([
             'code' => 201,

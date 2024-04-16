@@ -71,4 +71,24 @@ class GuardianController extends Controller
         ], 201);
 
     }
+
+    public function transactions (Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->hasRole('guardian')) {
+            $transactions = $user->transactions;
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'success',
+                'data' => $transactions
+            ], 200);
+        } else {
+            return response()->json([
+                'code' => 401,
+                'message' => 'Unauthorized: You are not a guardian.'
+            ], 401);
+        }
+    }
 }
