@@ -34,6 +34,11 @@ Route::prefix('v1/public')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('deleteUser', [AuthController::class, 'deleteUser']);
+
+    //stripe
+    Route::get('topup-wallet', [GuardianController::class, 'topupWallet'])->name('topup-wallet');
+    Route::get('success', [GuardianController::class, 'success'])->name('topup.success');
+    Route::get('cancel', [GuardianController::class, 'cancel'])->name('topup.cancel');
 });
 
 Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {  
@@ -44,6 +49,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
     Route::prefix('guardian')->group(function () {
         Route::get('profile', [GuardianController::class, 'guardianProfile']);
         Route::post('create-dependant', [GuardianController::class, 'registerDependant']);
+        Route::post('topup-wallet', [GuardianController::class, 'topupWallet'])->name('topup-wallet');
+        Route::get('transaction-history', [GuardianController::class, 'transactionHistory']);
+        Route::get('wallet', [GuardianController::class, 'wallet']);
     });
 
     //dependent
