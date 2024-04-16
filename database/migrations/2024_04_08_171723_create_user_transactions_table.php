@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('user_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('transaction_type_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('transaction_type_id');
             $table->string('reference')->unique();
             $table->decimal('amount', 15, 2);
-            $table->enum('status', ['success', 'failed', 'pending'])->default('pending');
+            $table->enum('status', ['success', 'failed', 'pending']);
             $table->string('narration')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('failed_at')->nullable();
             $table->timestamp('pending_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('transaction_type_id')->references('id')->on('transaction_types');
         });
     }
 

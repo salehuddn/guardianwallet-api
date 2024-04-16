@@ -56,4 +56,21 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'dependant_guardian', 'guardian_id', 'dependant_id');
     }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->wallet()->create([
+                'balance' => 0.00,
+                'status' => 'active',
+            ]);
+        });
+    }
 }
