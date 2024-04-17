@@ -44,7 +44,8 @@ class AuthController extends Controller
             $token = $user->createToken('GuardianWallet')->plainTextToken;
 
             return response()->json([
-                'token' => $token
+                'token' => $token,
+                'role' => $user->roles->pluck('name')[0]
             ], 200);
         }
 
