@@ -56,7 +56,10 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
     });
 
     //dependent
-    Route::prefix('dependent')->group(function () {
-        Route::get('/profile', [DependantController::class, 'dependentProfile']);
+    Route::prefix('dependant')->group(function () {
+        Route::get('profile', [DependantController::class, 'dependantProfile']);
+        Route::post('update-profile', [DependantController::class, 'updateProfile']);
+        Route::get('wallet', [DependantController::class, 'wallet']);
+        Route::get('transaction-history', [DependantController::class, 'transactionHistory']);
     });
 });
