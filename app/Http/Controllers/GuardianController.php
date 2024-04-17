@@ -45,6 +45,25 @@ class GuardianController extends Controller
         }
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->only(['name', 'dob', 'phone', 'password']);
+        $data = array_filter($data);
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'Profile updated successfully'
+        ], 200);
+    }
+
     public function guardianDependents(Request $request)
     {
         return response()->json([

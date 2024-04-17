@@ -48,6 +48,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
     //guardian
     Route::prefix('guardian')->group(function () {
         Route::get('profile', [GuardianController::class, 'guardianProfile']);
+        Route::post('update-profile', [GuardianController::class, 'updateProfile']);
         Route::post('create-dependant', [GuardianController::class, 'registerDependant']);
         Route::post('topup-wallet', [GuardianController::class, 'topupWallet'])->name('topup-wallet');
         Route::get('transaction-history', [GuardianController::class, 'transactionHistory']);
