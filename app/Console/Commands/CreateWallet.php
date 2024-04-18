@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Models\Merchant;
 use Illuminate\Console\Command;
 
 class CreateWallet extends Command
@@ -31,6 +32,15 @@ class CreateWallet extends Command
 
         foreach ($users as $user) {
             $user->wallet()->create([
+                'balance' => 0.00,
+                'status' => 'active',
+            ]);
+        }
+
+        $merchants = Merchant::doesntHave('wallet')->get();
+
+        foreach ($merchants as $merchant) {
+            $merchant->wallet()->create([
                 'balance' => 0.00,
                 'status' => 'active',
             ]);
