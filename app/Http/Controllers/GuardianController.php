@@ -212,4 +212,79 @@ class GuardianController extends Controller
             'wallet' => $user->wallet
         ], 200);
     }
+
+    public function transferFund(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$request->filled('amount')) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Amount is required'
+            ], 400);
+        }
+
+        if (!$request->filled('dependant_id')) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Dependant ID is required'
+            ], 400);
+        }
+
+        $dependant = User::find($request->dependant_id);
+
+        if (!$dependant) {
+            return response()->json([
+                'code' => 404,
+                'message' => 'Dependant not found'
+            ], 404);
+        }
+
+        if (!$user->dependants->contains($dependant->id)) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Dependant not found'
+            ], 400);
+        }
+
+        if ($user->wallet->balance < $request->amount) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Insufficient balance'
+            ], 400);
+        }
+
+        //create transaction
+        $transaction = $user->transactions()->create([
+            'amount' => $request->amount,
+            'transaction_type_id' => 2, //transfer fund
+            'status' => 'pending',
+            'pending_at' => now()
+        ]);
+
+        if ($transaction) {
+            //update wallet
+            $user->wallet->balance -= $transaction->amount;
+            $user->wallet->save();
+
+            //update dependant wallet
+            $dependant->wallet->balance += $transaction->amount;
+            $dependant->wallet->save();
+
+            //update transaction
+            $transaction->status = 'success';
+            $transaction->completed_at = now();
+            $transaction->save();
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Fund transferred successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Amount is required'
+            ], 400);
+        }
+    }
 }
