@@ -58,7 +58,11 @@ class MerchantSeeder extends Seeder
         ];
 
         foreach ($merchants as $merchant) {
-            Merchant::create($merchant);
+            $m = Merchant::create($merchant);
+            $m->wallet()->create([
+                'balance' => 0.00,
+                'status' => 'active',
+            ]);
         }
     }
 }
