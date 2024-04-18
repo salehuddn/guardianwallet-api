@@ -15,6 +15,7 @@ class UserTransaction extends Model
         'user_id',
         'transaction_type_id',
         'reference',
+        'narration',
         'amount',
         'status',
         'pending_at',

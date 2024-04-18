@@ -15,34 +15,39 @@ class GuardianController extends Controller
 {
     public function guardianProfile(Request $request)
     {
-        // $user = $request->user()->load('dependents');
+        $user = $request->user();
 
-        // return response()->json([
-        //     'code' => 200,
-        //     'message' => 'success',
-        //     'data' => $user
-        // ], 200);
-
-        $guardian = $request->user();
-
-        if ($guardian->hasRole('guardian')) {
-            if ($guardian->dependants->isNotEmpty()) {
-                return response()->json([
-                    'code' => 200,
-                    'user' => $guardian,
-                ], 200);
-            } else {
-                return response()->json([
-                    'code' => 200,
-                    'user' => $guardian,
-                ], 200);
-            }
-        } else {
+        if (!$user->hasRole('guardian')) {
             return response()->json([
                 'code' => 401,
                 'message' => 'Unauthorized: You are not a guardian.'
             ], 401);
         }
+
+        $guardian = User::with('dependants')->where('id', $user->id)->first();
+
+        $guardianProfile = [
+            'id' => $guardian->id,
+            'name' => $guardian->name,
+            'email' => $guardian->email,
+            'dob' => $guardian->dob,
+            'phone' => $guardian->phone,
+            'role' => $guardian->roles->pluck('name')->first(),
+            'dependants' => $guardian->dependants->map(function ($dependant) {
+                return [
+                    'id' => $dependant->id,
+                    'name' => $dependant->name,
+                    'email' => $dependant->email,
+                    'dob' => $dependant->dob,
+                    'phone' => $dependant->phone,
+                ];
+            }),
+        ];
+
+        return response()->json([
+            'code' => 200,
+            'user' => $guardianProfile,
+        ], 200);
     }
 
     public function updateProfile(Request $request)
@@ -64,12 +69,32 @@ class GuardianController extends Controller
         ], 200);
     }
 
-    public function guardianDependents(Request $request)
+    public function dependants(Request $request)
     {
+        $user = $request->user();
+
+        if (!$user->hasRole('guardian')) {
+            return response()->json([
+                'code' => 401,
+                'message' => 'Unauthorized: You are not a guardian.'
+            ], 401);
+        }
+
+        $guardian = User::with('dependants')->where('id', $user->id)->first();
+
         return response()->json([
             'code' => 200,
             'message' => 'success',
-            'data' => $request->user()->dependents
+            'dependant' => $guardian->dependants->map(function ($dependant) {
+                return [
+                    'id' => $dependant->id,
+                    'name' => $dependant->name,
+                    'email' => $dependant->email,
+                    'dob' => $dependant->dob,
+                    'phone' => $dependant->phone,
+                    'wallet' => $dependant->wallet->balance
+                ];
+            }),
         ], 200);
     }
 
@@ -205,11 +230,16 @@ class GuardianController extends Controller
     public function wallet(Request $request)
     {
         $user = $request->user();
+        $wallet = $user->wallet;
 
         return response()->json([
             'code' => 200,
             'message' => 'success',
-            'wallet' => $user->wallet
+            'wallet' => [
+                'id' => $wallet->id,
+                'balance' => $wallet->balance,
+                'status' => $wallet->status,
+            ]
         ], 200);
     }
 

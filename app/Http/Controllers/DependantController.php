@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -9,27 +11,30 @@ class DependantController extends Controller
 {
     public function dependantProfile(Request $request)
     {
-        // $user = $request->user()->load('dependents');
+        $user = $request->user();
 
-        // return response()->json([
-        //     'code' => 200,
-        //     'message' => 'success',
-        //     'data' => $user
-        // ], 200);
-
-        $dependant = $request->user();
-
-        if ($dependant->hasRole('dependant')) {
-            return response()->json([
-                'code' => 200,
-                'user' => $dependant,
-            ], 200);
-        } else {
+        if (!$user->hasRole('dependant')) {
             return response()->json([
                 'code' => 401,
                 'message' => 'Unauthorized: You are not a dependant.'
             ], 401);
         }
+
+        $dependant = User::where('id', $user->id)->first();
+
+        $dependantProfile = [
+            'id' => $dependant->id,
+            'name' => $dependant->name,
+            'email' => $dependant->email,
+            'dob' => $dependant->dob,
+            'phone' => $dependant->phone,
+            'role' => $dependant->roles->pluck('name')->first(),
+        ];
+
+        return response()->json([
+            'code' => 200,
+            'user' => $dependantProfile,
+        ], 200);
     }
 
     public function updateProfile(Request $request)
@@ -54,11 +59,16 @@ class DependantController extends Controller
     public function wallet(Request $request)
     {
         $user = $request->user();
+        $wallet = $user->wallet;
 
         return response()->json([
             'code' => 200,
             'message' => 'success',
-            'wallet' => $user->wallet
+            'wallet' => [
+                'id' => $wallet->id,
+                'balance' => $wallet->balance,
+                'status' => $wallet->status,
+            ]
         ], 200);
     }
 
@@ -80,5 +90,87 @@ class DependantController extends Controller
                 'message' => 'Unauthorized: You are not a dependant.'
             ], 401);
         }
+    }
+
+    public function scanQr (Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->hasRole('dependant')) {
+            return response()->json([
+                'code' => 401,
+                'message' => 'Unauthorized: You are not a dependant.'
+            ], 401);
+        }
+
+        if (!$request->qr_content) {
+            return response()->json([
+                'code' => '400',
+                'message' => 'qr_content is required'
+            ], 400);
+        }
+
+        $qrContent = explode('-', $request->qr_content);
+        $merchant = Merchant::find($qrContent[0]);
+
+        return response()->json([
+            'code' => '200',
+            'message' => 'success',
+            'merchant' => $merchant
+        ], 200);
+    }
+
+    public function transferFund (Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->hasRole('dependant')) {
+            return response()->json([
+                'code' => 401,
+                'message' => 'Unauthorized: You are not a dependant.'
+            ], 401);
+        }
+
+        $data = $request->all();
+
+        if (!$data['amount'] || !$data['merchant_id']) {
+            return response()->json([
+                'code' => '400',
+                'message' => 'amount and recipient_id are required'
+            ], 400);
+        }
+
+        $merchant = Merchant::find($data['merchant_id']);
+
+        //create transaction
+        $transaction = $user->transactions()->create([
+            'amount' => $request->amount,
+            'transaction_type_id' => 2,
+            'status' => 'pending',
+            'narration' => $merchant->type->name,
+            'pending_at' => now()
+        ]);
+
+        if (!$merchant) {
+            return response()->json([
+                'code' => '404',
+                'message' => 'Merchant not found'
+            ], 404);
+        }
+
+        //update user & merchant wallet
+        $user->wallet->decrement('balance', $data['amount']);
+        $merchant->wallet->increment('balance', $data['amount']);
+
+        //update transaction
+        $transaction->update([
+            'status' => 'success',
+            'completed_at' => now()
+        ]);
+
+        return response()->json([
+            'code' => '200',
+            'message' => 'Fund transferred successfully'
+        ], 200);
     }
 }
