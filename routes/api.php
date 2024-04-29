@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
         Route::get('transaction-history', [GuardianController::class, 'transactionHistory']);
         Route::get('wallet', [GuardianController::class, 'wallet']);
         Route::post('transfer-fund', [GuardianController::class, 'transferFund']);
+        
     });
 
     //dependent

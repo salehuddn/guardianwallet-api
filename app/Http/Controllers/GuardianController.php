@@ -184,7 +184,8 @@ class GuardianController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Session created successfully',
-                'checkoutUrl' => $session->url
+                'checkoutUrl' => $session->url,
+                'transactionId', $transaction->id
             ], 200);
 
         } else {
@@ -198,6 +199,7 @@ class GuardianController extends Controller
     public function success(Request $request)
     {
         $transaction_id = $request->query('transaction_id');
+        Log::info('Transaction ID: ' . $transaction_id);
 
         //update transaction
         $transaction = UserTransaction::find($transaction_id);
@@ -212,7 +214,8 @@ class GuardianController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'Wallet topped up successfully'
+            'message' => 'Wallet topped up successfully',
+            'transaction' => $transaction
         ], 200);
     }
 
@@ -228,7 +231,8 @@ class GuardianController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'Wallet topup cancelled'
+            'message' => 'Wallet topup cancelled',
+            'transaction' => $transaction
         ], 200);
     }
 
