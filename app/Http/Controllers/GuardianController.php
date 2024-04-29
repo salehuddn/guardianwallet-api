@@ -144,7 +144,7 @@ class GuardianController extends Controller
     {
         Stripe::setApiKey(config('stripe.sk'));
         $user = $request->user();
-        // $user = User::find(4);
+        // $user = User::find(2);
 
         if (!$request->filled('amount')) {
             return response()->json([
@@ -180,7 +180,12 @@ class GuardianController extends Controller
                 'cancel_url' => route('topup.cancel', ['transaction_id' => $transaction->id]),
             ]);
     
-            return redirect()->away($session->url);
+            // return redirect()->away($session->url);
+            return response()->json([
+                'code' => 200,
+                'message' => 'Session created successfully',
+                'checkoutUrl' => $session->url
+            ], 200);
 
         } else {
             return response()->json([
