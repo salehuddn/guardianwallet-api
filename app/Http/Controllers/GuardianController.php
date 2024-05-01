@@ -317,7 +317,8 @@ class GuardianController extends Controller
 
             return response()->json([
                 'code' => 200,
-                'message' => 'Fund transferred successfully'
+                'message' => 'Fund transferred successfully',
+                'transaction' => $transaction
             ], 200);
         } else {
             return response()->json([
@@ -325,5 +326,47 @@ class GuardianController extends Controller
                 'message' => 'Amount is required'
             ], 400);
         }
+    }
+
+    public function updateDependent(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$request->filled('dependant_id')) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Dependant ID is required'
+            ], 400);
+        }
+
+        $dependant = User::find($request->dependant_id);
+
+        if (!$dependant) {
+            return response()->json([
+                'code' => 404,
+                'message' => 'Dependant not found'
+            ], 404);
+        }
+
+        if (!$user->dependants->contains($dependant->id)) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Dependant not found'
+            ], 400);
+        }
+
+        $data = $request->only(['name', 'dob', 'phone', 'password']);
+        $data = array_filter($data);
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        $dependant->update($data);
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'Dependant updated successfully'
+        ], 200);
     }
 }

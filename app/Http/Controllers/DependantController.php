@@ -166,11 +166,13 @@ class DependantController extends Controller
         $transaction->update([
             'status' => 'success',
             'completed_at' => now()
+            
         ]);
 
         return response()->json([
             'code' => '200',
-            'message' => 'Fund transferred successfully'
+            'message' => 'Fund transferred successfully',
+            'transaction' => $transaction
         ], 200);
     }
 }
