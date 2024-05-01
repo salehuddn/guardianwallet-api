@@ -66,11 +66,22 @@ class AuthController extends Controller
             ], 404);
         }
 
+        if (!$user) {
+            return response()->json([
+                'code' => 404,
+                'message' => 'User not found'
+            ], 404);
+        }
+    
+        $user->wallet()->delete();
+        $user->transactions()->delete();
+        $user->dependants()->detach();
+    
         $user->delete();
-
+    
         return response()->json([
             'code' => 200,
-            'message' => 'User deleted successfully'
+            'message' => 'User and related data deleted successfully'
         ], 200);
     }
 

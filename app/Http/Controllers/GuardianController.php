@@ -92,7 +92,8 @@ class GuardianController extends Controller
                     'email' => $dependant->email,
                     'dob' => $dependant->dob,
                     'phone' => $dependant->phone,
-                    'wallet' => $dependant->wallet->balance
+                    'wallet' => $dependant->wallet->balance,
+                    'spending_limit' => $dependant->spending_limit ?? '0.00',
                 ];
             }),
         ], 200);
