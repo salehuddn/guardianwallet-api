@@ -355,7 +355,7 @@ class GuardianController extends Controller
             ], 400);
         }
 
-        $data = $request->only(['name', 'dob', 'phone', 'password']);
+        $data = $request->only(['name', 'dob', 'phone', 'password', 'spending_limit']);
         $data = array_filter($data);
 
         if (isset($data['password'])) {

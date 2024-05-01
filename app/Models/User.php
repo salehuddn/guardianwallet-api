@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'dob',
+        'spending_limit',
     ];
 
     /**
