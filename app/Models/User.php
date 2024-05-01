@@ -67,6 +67,17 @@ class User extends Authenticatable
         return $this->hasMany(UserTransaction::class);
     }
 
+    public function setSpendingLimit($limit)
+    {
+        $this->spending_limit = $limit;
+        $this->save();
+    }
+
+    public function getSpendingLimit()
+    {
+        return $this->spending_limit;
+    }
+
     protected static function boot()
     {
         parent::boot();

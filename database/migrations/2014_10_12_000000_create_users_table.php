@@ -19,6 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->date('dob')->nullable();
+            $table->decimal('spending_limit', 15, 2)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

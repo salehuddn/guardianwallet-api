@@ -108,6 +108,7 @@ class GuardianController extends Controller
         ]);
 
         $user->assignRole('dependant');
+        $user->setSpendingLimit($request->spending_limit ?? 0.00);
         $user->save();
 
         $guardian = $request->user();
@@ -117,7 +118,6 @@ class GuardianController extends Controller
             'code' => 201,
             'message' => 'User registered successfully'
         ], 201);
-
     }
 
     public function transactionHistory (Request $request)
