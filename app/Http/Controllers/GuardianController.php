@@ -9,6 +9,7 @@ use Stripe\Checkout\Session;
 use App\Models\UserTransaction;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Services\TransactionService;
 use App\Http\Requests\RegisterDependantRequest;
 
 class GuardianController extends Controller
@@ -157,7 +158,7 @@ class GuardianController extends Controller
         //create transaction
         $transaction = $user->transactions()->create([
             'amount' => $request->amount,
-            'transaction_type_id' => 1, //topup wallet
+            'transaction_type_id' => TransactionService::getTransactionTypeIdBySlug("topup-wallet"), //topup wallet
             'status' => 'pending',
             'pending_at' => now()
         ]);
@@ -297,7 +298,7 @@ class GuardianController extends Controller
         //create transaction
         $transaction = $user->transactions()->create([
             'amount' => $request->amount,
-            'transaction_type_id' => 2, //transfer fund
+            'transaction_type_id' => TransactionService::getTransactionTypeIdBySlug("transfer-fund"), //transfer fund
             'status' => 'pending',
             'pending_at' => now()
         ]);
@@ -310,6 +311,14 @@ class GuardianController extends Controller
             //update dependant wallet
             $dependant->wallet->balance += $transaction->amount;
             $dependant->wallet->save();
+
+            //create dependant successful transaction
+            $dependant->transactions()->create([
+                'amount' => $request->amount,
+                'transaction_type_id' => TransactionService::getTransactionTypeIdBySlug("receive-fund"), //receive fund
+                'status' => 'success',
+                'completed_at' => now()
+            ]);
 
             //update transaction
             $transaction->status = 'success';
