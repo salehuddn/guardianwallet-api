@@ -1,4 +1,3 @@
-cd /domains/salehuddn.dev/public_html/guardianwallet
 git pull
-composer install
+composer2 install
 php artisan optimize:clear
