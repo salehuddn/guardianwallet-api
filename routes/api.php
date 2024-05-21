@@ -3,10 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DependantController;
 use App\Http\Controllers\GuardianController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\DependantController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,10 @@ Route::prefix('v1/public')->group(function () {
 Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {  
     //auth
     Route::post('logout', [AuthController::class, 'logout']);
+
+    //notification
+    Route::get('notifications', [NotificationController::class, 'getNotifications']);
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     
     //guardian
     Route::prefix('guardian')->group(function () {

@@ -5,37 +5,35 @@ namespace App\Console\Commands;
 use App\Models\User;
 use Illuminate\Console\Command;
 use App\Http\Services\SpendingService;
+use App\Notifications\SpendingLimitNotification;
 
-class SendNotifications extends Command
+class CheckDependantSpendingLimit extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'notification:send';
+    protected $signature = 'check:spending-limit';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Send notifications to users.';
+    protected $description = 'Check dependant spending limit';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        //send notifications for users role dependant almost exceed spending limit (e.g. 70% of the limit)
         $users = User::role('dependant')->get();
 
         foreach ($users as $user) {
             $result = SpendingService::hasAlmostExceededLimit($user);
             if ($result && $result['code'] === '200') {
-                dd($result['message']);
-                // Send notification to the user
-                $this->sendNotification($user, $result['message']);
+                $user->notify(new SpendingLimitNotification($result['message']));
             }
         }
     }
