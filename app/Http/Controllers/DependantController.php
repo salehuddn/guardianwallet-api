@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Services\SpendingService;
 
 class DependantController extends Controller
 {
@@ -142,7 +143,13 @@ class DependantController extends Controller
 
         $merchant = Merchant::find($data['merchant_id']);
 
-        //create transaction
+        // check user spending limit
+        $limitCheckResult = SpendingService::checkLimit($user, $data['amount']);
+        if ($limitCheckResult) {
+            return response()->json($limitCheckResult, 400);
+        }
+
+        // create transaction
         $transaction = $user->transactions()->create([
             'amount' => $request->amount,
             'transaction_type_id' => 2,
@@ -166,7 +173,6 @@ class DependantController extends Controller
         $transaction->update([
             'status' => 'success',
             'completed_at' => now()
-            
         ]);
 
         return response()->json([
