@@ -60,11 +60,11 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
         Route::get('transaction-history', [GuardianController::class, 'transactionHistory']);
         Route::get('wallet', [GuardianController::class, 'wallet']);
         Route::post('transfer-fund', [GuardianController::class, 'transferFund']);
-        Route::post('update-dependent', [GuardianController::class, 'updateDependent']);
+        Route::post('update-dependant/{dependantId}', [GuardianController::class, 'updateDependant']);
 
     });
 
-    //dependent
+    //dependant
     Route::prefix('dependant')->group(function () {
         Route::get('profile', [DependantController::class, 'dependantProfile']);
         Route::post('update-profile', [DependantController::class, 'updateProfile']);

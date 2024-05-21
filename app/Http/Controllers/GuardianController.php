@@ -338,18 +338,18 @@ class GuardianController extends Controller
         }
     }
 
-    public function updateDependent(Request $request)
+    public function updateDependant(Request $request, $dependantId)
     {
         $user = $request->user();
 
-        if (!$request->filled('dependant_id')) {
+        if (!$dependantId) {
             return response()->json([
                 'code' => 400,
                 'message' => 'Dependant ID is required'
             ], 400);
         }
 
-        $dependant = User::find($request->dependant_id);
+        $dependant = User::find($dependantId);
 
         if (!$dependant) {
             return response()->json([
