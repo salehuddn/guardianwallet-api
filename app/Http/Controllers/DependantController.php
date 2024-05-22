@@ -30,6 +30,7 @@ class DependantController extends Controller
             'dob' => $dependant->dob,
             'phone' => $dependant->phone,
             'role' => $dependant->roles->pluck('name')->first(),
+            'spending_limit' => $dependant->spendingLimit ? $dependant->spendingLimit->limit : 'N/A',
         ];
 
         return response()->json([
