@@ -58,6 +58,11 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'dependant_guardian', 'guardian_id', 'dependant_id');
     }
 
+    public function guardians()
+    {
+        return $this->belongsToMany(User::class, 'dependant_guardian', 'dependant_id', 'guardian_id');
+    }
+
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);

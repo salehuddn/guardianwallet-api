@@ -34,6 +34,11 @@ class CheckDependantSpendingLimit extends Command
             $result = SpendingService::hasAlmostExceededLimit($user);
             if ($result && $result['code'] === '200') {
                 $user->notify(new SpendingLimitNotification($result['message']));
+
+                $guardian = $user->guardians()->first();
+                if ($guardian) {
+                    $guardian->notify(new SpendingLimitNotification("Your dependant {$user->name} has spent more than 70% of their spending limit"));
+                }
             }
         }
     }
