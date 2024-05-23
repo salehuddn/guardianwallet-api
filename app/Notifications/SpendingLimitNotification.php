@@ -11,16 +11,19 @@ class SpendingLimitNotification extends Notification
 {
     use Queueable;
 
+    protected $title;
     protected $message;
 
     /**
      * Create a new notification instance.
      *
+     * @param string $title
      * @param string $message
      * @return void
      */
-    public function __construct($message)
+    public function __construct($title, $message)
     {
+        $this->title = $title;
         $this->message = $message;
     }
 
@@ -44,6 +47,7 @@ class SpendingLimitNotification extends Notification
     public function toDatabase($notifiable)
     {
         return [
+            'title' => $this->title,
             'message' => $this->message,
             'user_id' => $notifiable->id,
         ];

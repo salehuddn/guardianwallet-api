@@ -33,11 +33,18 @@ class CheckDependantSpendingLimit extends Command
         foreach ($users as $user) {
             $result = SpendingService::hasAlmostExceededLimit($user);
             if ($result && $result['code'] === '200') {
-                $user->notify(new SpendingLimitNotification($result['message']));
-
-                $guardian = $user->guardians()->first();
-                if ($guardian) {
-                    $guardian->notify(new SpendingLimitNotification("Your dependant {$user->name} has spent more than 70% of their spending limit"));
+                // determine the title based on user type
+                $title = $user->hasRole('guardian') ? "User: {$user->name}" : 'Spending Limit Alert';
+                
+                // notify the user with the appropriate title
+                $user->notify(new SpendingLimitNotification($title, $result['message']));
+                
+                // notify the guardian if it's a dependant
+                if ($user->hasRole('dependant')) {
+                    $guardian = $user->guardians()->first();
+                    if ($guardian) {
+                        $guardian->notify(new SpendingLimitNotification("Your dependant {$user->name} has spent more than 70% of their spending limit"));
+                    }
                 }
             }
         }
