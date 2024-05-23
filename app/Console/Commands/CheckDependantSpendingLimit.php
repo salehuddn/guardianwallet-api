@@ -32,7 +32,13 @@ class CheckDependantSpendingLimit extends Command
 
         foreach ($users as $user) {
             $result = SpendingService::hasAlmostExceededLimit($user);
-            if ($result && $result['code'] === '200') {
+
+            // if the result is null, skip this iteration
+            if (!$result) {
+                continue;
+            }
+
+            if ($result['code'] === '200') {
                 $title = 'Spending Limit Alert';
                 
                 // notify the user with the appropriate title
@@ -50,4 +56,5 @@ class CheckDependantSpendingLimit extends Command
             }
         }
     }
+
 }

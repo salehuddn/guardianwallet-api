@@ -36,30 +36,36 @@ class SpendingService
 
   public static function hasAlmostExceededLimit(User $user)
   {
-    // get user spending limit
-    $spendingLimit = $user->getSpendingLimit();
-    $threshold = 0.7 * $spendingLimit; // 70% of the spending limit
+      // get user spending limit
+      $spendingLimit = $user->getSpendingLimit();
+      
+      // Return null if the spending limit is 0.00
+      if ($spendingLimit == 0.00) {
+          return null;
+      }
 
-    // get current week's start and end dates
-    $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
-    $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
+      $threshold = 0.7 * $spendingLimit; // 70% of the spending limit
 
-    // calculate the total amount spent by user within the current week
-    $totalSpentThisWeek = $user->transactions()
-      ->where('created_at', '>=', $startOfWeek)
-      ->where('created_at', '<=', $endOfWeek)
-      ->where('status', 'success')
-      ->sum('amount');
+      // get current week's start and end dates
+      $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
+      $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
 
-    // check if the total spent exceeds 70% of the spending limit
-    if ($totalSpentThisWeek >= $threshold) {
-      return [
-        'code' => '200',
-        'message' => 'You have spent more than 70% of your spending limit'
-      ];
-    }
+      // calculate the total amount spent by user within the current week
+      $totalSpentThisWeek = $user->transactions()
+          ->where('created_at', '>=', $startOfWeek)
+          ->where('created_at', '<=', $endOfWeek)
+          ->where('status', 'success')
+          ->sum('amount');
 
-    return null;
+      // check if the total spent exceeds 70% of the spending limit
+      if ($totalSpentThisWeek >= $threshold) {
+          return [
+              'code' => '200',
+              'message' => 'You have spent more than 70% of your spending limit'
+          ];
+      }
+
+      return null;
   }
-  
+
 }
