@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Services\TransactionService;
 
 class SpendingService
 {
@@ -21,7 +22,7 @@ class SpendingService
       ->where('created_at', '>=', $startOfWeek)
       ->where('created_at', '<=', $endOfWeek)
       ->where('status', 'success')
-      ->where('transaction_type_id', 2) // Assuming transaction_type_id 2 is for spending
+      ->where('transaction_type_id', TransactionService::getTransactionTypeIdBySlug("transfer-fund")) 
       ->sum('amount');
 
     // Log the spending details
