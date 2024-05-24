@@ -8,7 +8,7 @@ use Carbon\Carbon;
 class SpendingService
 {
   public static function checkLimit(User $user, $amount)
-  {
+{
     // get user spending limit
     $spendingLimit = $user->getSpendingLimit();
 
@@ -16,12 +16,20 @@ class SpendingService
     $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
     $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
 
-    // calculate the total amount spent by user within the current week
+    // calculate the total amount spent by user within the current week for spending transactions only
     $totalSpentThisWeek = $user->transactions()
       ->where('created_at', '>=', $startOfWeek)
       ->where('created_at', '<=', $endOfWeek)
       ->where('status', 'success')
+      ->where('transaction_type_id', 2) // Assuming transaction_type_id 2 is for spending
       ->sum('amount');
+
+    // Log the spending details
+    \Log::info('Spending Limit Check:', [
+        'spendingLimit' => $spendingLimit,
+        'totalSpentThisWeek' => $totalSpentThisWeek,
+        'amount' => $amount
+    ]);
 
     // check if the total spent plus the current transaction amount exceeds the spending limit
     if ($totalSpentThisWeek + $amount > $spendingLimit) {
@@ -32,7 +40,8 @@ class SpendingService
     }
 
     return null;
-  }
+}
+
 
   public static function hasAlmostExceededLimit(User $user)
   {
