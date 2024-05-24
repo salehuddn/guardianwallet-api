@@ -149,6 +149,24 @@ class DependantController extends Controller
         // check user spending limit
         $limitCheckResult = SpendingService::checkLimit($user, $data['amount']);
         if ($limitCheckResult) {
+            // send notification to dependant & guardian
+            $title = 'Spending Limit Alert';
+            $user->notify(new SpendingLimitNotification(
+                "Spending Limit Exceeded",
+                "You have exceeded your spending limit for the week"
+            ));
+
+            // notify the guardian
+            if ($user->hasRole('dependant')) {
+                $guardian = $user->guardians()->first();
+                if ($guardian) {
+                    $guardian->notify(new SpendingLimitNotification(
+                        "User: {$user->name}",
+                        "Your dependant {$user->name} has spent more than 70% of their spending limit"
+                    ));
+                }
+            }
+
             return response()->json($limitCheckResult, 400);
         }
 
