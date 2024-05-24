@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Services\SpendingService;
+use App\Services\TransactionService;
+use Illuminate\Support\Facades\Hash;
+use App\Notifications\SpendingLimitNotification;
 
 class DependantController extends Controller
 {
@@ -153,7 +155,7 @@ class DependantController extends Controller
         // create transaction
         $transaction = $user->transactions()->create([
             'amount' => $request->amount,
-            'transaction_type_id' => 2,
+            'transaction_type_id' => TransactionService::getTransactionTypeIdBySlug("transfer-fund"),
             'status' => 'pending',
             'narration' => $merchant->type->name,
             'pending_at' => now()
@@ -175,6 +177,25 @@ class DependantController extends Controller
             'status' => 'success',
             'completed_at' => now()
         ]);
+
+        // check if user has almost exceeded the limit
+        $exceedLimit = SpendingService::hasAlmostExceededLimit($user);
+
+        if ($exceedLimit['code'] === 200) {
+            $title = 'Spending Limit Alert';
+            $user->notify(new SpendingLimitNotification($title, $exceedLimit['message']));
+
+            // notify the guardian
+            if ($user->hasRole('dependant')) {
+                $guardian = $user->guardians()->first();
+                if ($guardian) {
+                    $guardian->notify(new SpendingLimitNotification(
+                        "User: {$user->name}",
+                        "Your dependant {$user->name} has spent more than 70% of their spending limit"
+                    ));
+                }
+            }
+        }
 
         return response()->json([
             'code' => '200',
