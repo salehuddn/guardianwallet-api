@@ -162,7 +162,7 @@ class DependantController extends Controller
                 if ($guardian) {
                     $guardian->notify(new SpendingLimitNotification(
                         "User: {$user->name}",
-                        "Your dependant {$user->name} has spent more than 70% of their spending limit"
+                        "Your dependant {$user->name} has exceeded their spending limit for the week"
                     ));
                 }
             }
