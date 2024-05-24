@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
-use App\Http\Services\SpendingService;
+use App\Services\SpendingService;
 use App\Notifications\SpendingLimitNotification;
 
 class CheckDependantSpendingLimit extends Command

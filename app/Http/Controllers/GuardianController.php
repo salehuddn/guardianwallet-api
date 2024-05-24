@@ -9,7 +9,7 @@ use Stripe\Checkout\Session;
 use App\Models\UserTransaction;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Services\TransactionService;
+use App\Services\TransactionService;
 use App\Http\Requests\RegisterDependantRequest;
 
 class GuardianController extends Controller

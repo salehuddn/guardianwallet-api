@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Services\SpendingService;
+use App\Services\SpendingService;
 
 class DependantController extends Controller
 {
