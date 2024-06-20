@@ -32,7 +32,7 @@ class DependantController extends Controller
             'dob' => $dependant->dob,
             'phone' => $dependant->phone,
             'role' => $dependant->roles->pluck('name')->first(),
-            'spending_limit' => $dependant->spendingLimit ? $dependant->spendingLimit->limit : 'N/A',
+            'spending_limit' => $dependant->getSpendingLimit() ?? 'N/A'
         ];
 
         return response()->json([
@@ -199,7 +199,7 @@ class DependantController extends Controller
         // check if user has almost exceeded the limit
         $exceedLimit = SpendingService::hasAlmostExceededLimit($user);
 
-        if ($exceedLimit['code'] === 200) {
+        if ($exceedLimit && $exceedLimit['code'] === 200) {
             $title = 'Spending Limit Alert';
             $user->notify(new SpendingLimitNotification($title, $exceedLimit['message']));
 
