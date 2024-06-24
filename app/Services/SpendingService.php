@@ -9,39 +9,39 @@ use App\Services\TransactionService;
 class SpendingService
 {
   public static function checkLimit(User $user, $amount)
-{
-    // get user spending limit
-    $spendingLimit = $user->getSpendingLimit();
+  {
+      // get user spending limit
+      $spendingLimit = $user->getSpendingLimit();
 
-    // get current week's start and end dates
-    $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
-    $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
+      // get current week's start and end dates
+      $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d H:i:s');
+      $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d H:i:s');
 
-    // calculate the total amount spent by user within the current week for spending transactions only
-    $totalSpentThisWeek = $user->transactions()
-      ->where('created_at', '>=', $startOfWeek)
-      ->where('created_at', '<=', $endOfWeek)
-      ->where('status', 'success')
-      ->where('transaction_type_id', TransactionService::getTransactionTypeIdBySlug("transfer-fund")) 
-      ->sum('amount');
+      // calculate the total amount spent by user within the current week for spending transactions only
+      $totalSpentThisWeek = $user->transactions()
+        ->where('created_at', '>=', $startOfWeek)
+        ->where('created_at', '<=', $endOfWeek)
+        ->where('status', 'success')
+        ->where('transaction_type_id', TransactionService::getTransactionTypeIdBySlug("transfer-fund")) 
+        ->sum('amount');
 
-    // Log the spending details
-    \Log::info('Spending Limit Check:', [
-        'spendingLimit' => $spendingLimit,
-        'totalSpentThisWeek' => $totalSpentThisWeek,
-        'amount' => $amount
-    ]);
+      // Log the spending details
+      \Log::info('Spending Limit Check:', [
+          'spendingLimit' => $spendingLimit,
+          'totalSpentThisWeek' => $totalSpentThisWeek,
+          'amount' => $amount
+      ]);
 
-    // check if the total spent plus the current transaction amount exceeds the spending limit
-    if ($totalSpentThisWeek + $amount > $spendingLimit) {
-      return [
-        'code' => '400',
-        'message' => 'Weekly spending limit exceeded'
-      ];
-    }
+      // check if the total spent plus the current transaction amount exceeds the spending limit
+      if ($totalSpentThisWeek + $amount > $spendingLimit) {
+        return [
+          'code' => '400',
+          'message' => 'Weekly spending limit exceeded'
+        ];
+      }
 
-    return null;
-}
+      return null;
+  }
 
 
   public static function hasAlmostExceededLimit(User $user)

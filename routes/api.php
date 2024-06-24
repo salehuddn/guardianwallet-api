@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -45,6 +46,10 @@ Route::prefix('v1/public')->group(function () {
     //merchants
     Route::get('merchants', [MerchantController::class, 'listOfMerchants']);
     Route::get('qr-code', [MerchantController::class, 'showQr']);
+
+    Route::prefix('analytic')->group(function () {
+        Route::get('/', [AnalyticController::class, 'analyze']);
+    });
 });
 
 Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {  
@@ -77,5 +82,10 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
         Route::get('transaction-history', [DependantController::class, 'transactionHistory']);
         Route::post('scan-qr', [DependantController::class, 'scanQr']);
         Route::post('transfer-fund', [DependantController::class, 'transferFund']);
+    });
+
+    //analytics
+    Route::prefix('analytic')->group(function () {
+        Route::get('analyze', [AnalyticController::class, 'analyze']);
     });
 });
