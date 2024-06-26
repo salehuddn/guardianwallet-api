@@ -111,7 +111,7 @@ class AnalyticController extends Controller
     public function budgetAnalysis($dependentId, Request $request)
     {
         $user = $request->user();
-        $authResponse = $this->authenticate($user, 'dependant');;
+        $authResponse = $this->authenticate($user, ['guardian', 'dependant']);
         if ($authResponse) {
             return $authResponse;
         }
