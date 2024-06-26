@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BudgetAnalysis;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -120,6 +121,18 @@ class AnalyticController extends Controller
         }
 
         $currentMonth = $request->input('current_month') ?? now()->format('Y-m');
+
+        if ($currentMonth < now()->format('Y-m')) {
+            $result = BudgetAnalysis::select('month', 'income', 'spending', 'limits', 'analysis', 'recommendations', 'percentages')
+                        ->where('user_id', $dependentId)
+                        ->where('month', $currentMonth)
+                        ->first();
+
+            return response()->json([
+                'code' => 200,
+                'data' => $result
+            ]);
+        } 
 
         $result = AnalyticService::budgetAnalysis($dependentId, $currentMonth);
 

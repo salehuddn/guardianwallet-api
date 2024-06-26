@@ -250,6 +250,7 @@ class AnalyticService
         ];
 
         return [
+            'month' => $currentMonth,
             'income' => $income,
             'spending' => $spending,
             'limits' => $limits,
