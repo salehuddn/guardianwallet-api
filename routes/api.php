@@ -86,8 +86,8 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
 
         Route::prefix('savings')->group(function () {
             Route::post('create', [DependantController::class, 'createSavingFund']);
-            Route::put('update/{id}', [DependantController::class, 'updateSavingFund']);
-            Route::delete('delete/{id}', [DependantController::class, 'deleteSavingFund']);
+            Route::put('update/{dependantId}', [DependantController::class, 'updateSavingFund']);
+            Route::delete('delete/{dependantId}', [DependantController::class, 'deleteSavingFund']);
             Route::post('transfer', [DependantController::class, 'transferToSavingFund']);
             Route::post('withdraw', [DependantController::class, 'withdrawFromSavingFund']);
             Route::get('all', [DependantController::class, 'getAllSavings']);
@@ -96,6 +96,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
 
     //analytics
     Route::prefix('analytic')->group(function () {
-        Route::get('analyze', [AnalyticController::class, 'analyze']);
+        Route::get('/', [AnalyticController::class, 'analyze']);
+        Route::get('budget/{dependantId}', [AnalyticController::class, 'budgetAnalysis']);
     });
 });

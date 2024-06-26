@@ -108,11 +108,17 @@ class AnalyticController extends Controller
         return response()->json($analytics);
     }
 
-    public function budgetAnalysis($dependentId)
+    public function budgetAnalysis($dependentId, Request $request)
     {
-        $currentMonth = now()->format('Y-m');
-        
-        // fetch total monthly income
+        $user = $request->user();
+        $authResponse = $this->authenticate($user, 'dependant');;
+        if ($authResponse) {
+            return $authResponse;
+        }
+
+        $currentMonth = $request->input('current_month') ?? now()->format('Y-m');
+
+        // fetch the dependent user
         $dependent = User::find($dependentId);
 
         // check if the dependent exists and has the role 'dependant'
@@ -120,14 +126,14 @@ class AnalyticController extends Controller
             // fetch total monthly income for the current month
             $income = $dependent->getTotalIncome($currentMonth);
         } else {
-            // handle the case where the user does not exist or is not a dependant
-            $income = 0;
+            return response()->json(['error' => 'Dependent not found or not a dependant'], 404);
         }
-        
+
         if ($income == 0) {
             return response()->json(['error' => 'No income found for the current month'], 404);
         }
 
+        // define the budget rule
         $selectedRule = '50/30/20';
         $budget = $this->rules[$selectedRule];
 
@@ -155,6 +161,17 @@ class AnalyticController extends Controller
                     $spending['savings'] += $transaction->amount;
                     break;
             }
+        }
+
+        // fetch savings for the current month
+        $savingTransactionType = TransactionService::getTransactionTypeIdBySlug("add-to-savings");
+        $savingsTransactions = UserTransaction::where('user_id', $dependentId)
+                                ->where('transaction_type_id', $savingTransactionType)
+                                ->where('created_at', 'like', $currentMonth . '%')
+                                ->get();
+    
+        foreach ($savingsTransactions as $savingTransaction) {
+            $spending['savings'] += $savingTransaction->amount;
         }
 
         // calculate budget limits
