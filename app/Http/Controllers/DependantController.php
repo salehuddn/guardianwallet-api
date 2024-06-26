@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Savings;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Services\SpendingService;
 use App\Services\TransactionService;
 use Illuminate\Support\Facades\Hash;
