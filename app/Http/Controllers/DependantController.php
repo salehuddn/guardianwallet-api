@@ -457,7 +457,7 @@ class DependantController extends Controller
         $transaction = $user->transactions()->create([
             'amount' => $data['amount'],
             'transaction_type_id' => TransactionService::getTransactionTypeIdBySlug("withdraw-from-savings"),
-            'saving_id' => $savingFund->id,
+            'savings_id' => $savingFund->id,
             'status' => 'pending',
             'narration' => 'Withdrawal from Savings',
             'pending_at' => now()
