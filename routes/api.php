@@ -90,6 +90,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
             Route::delete('delete/{id}', [DependantController::class, 'deleteSavingFund']);
             Route::post('transfer', [DependantController::class, 'transferToSavingFund']);
             Route::post('withdraw', [DependantController::class, 'withdrawFromSavingFund']);
+            Route::get('all', [DependantController::class, 'getAllSavings']);
         });
     });
 

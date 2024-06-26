@@ -306,7 +306,7 @@ class DependantController extends Controller
             }
 
             $savingFund->update([
-                'name' => data['name'] ,
+                'name' => $data['name'] ,
                 'goal_amount' => $goalAmount,
                 'remaining_amount' => $remainingAmount,
             ]);
@@ -484,6 +484,24 @@ class DependantController extends Controller
             'code' => '200',
             'message' => 'Fund withdrawn successfully',
             'transaction' => $transaction
+        ], 200);
+    }
+
+    public function getAllSavings(Request $request)
+    {
+        $user = $request->user();
+        $authResponse = $this->authenticate($user, 'dependant');
+        if ($authResponse) {
+            return $authResponse;
+        }
+
+        // get all savings for the authenticated user
+        $savings = $user->savings()->select('id', 'name', 'goal_amount', 'amount', 'remaining')->get();
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'Savings retrieved successfully',
+            'savings' => $savings
         ], 200);
     }
 }
