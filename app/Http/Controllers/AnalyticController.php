@@ -9,6 +9,8 @@ use App\Models\UserTransaction;
 use App\Services\AnalyticService;
 use App\Services\TransactionService;
 
+use function PHPUnit\Framework\isEmpty;
+
 class AnalyticController extends Controller
 {
     protected $rules = [
@@ -131,7 +133,10 @@ class AnalyticController extends Controller
         }
 
         if ($income == 0) {
-            return response()->json(['error' => 'No income found for the current month'], 404);
+            return response()->json([
+                'code' => 404,
+                'message' => 'No income found for the current month'
+            ], 404);
         }
 
         // define the budget rule
@@ -143,6 +148,13 @@ class AnalyticController extends Controller
                             ->where('created_at', 'like', $currentMonth . '%')
                             ->whereNotNull('merchant_id')
                             ->get();
+
+        if (isEmpty($transactions)) {
+            return response()->json([
+                'code' => 404,
+                'message' => 'No transaction found for the current month'
+            ], 404);
+        }
 
         // categorize transactions
         $spending = [
@@ -171,8 +183,9 @@ class AnalyticController extends Controller
         // fetch savings for the current month
         $savingTransactionType = TransactionService::getTransactionTypeIdBySlug("add-to-savings");
         $savingsTransactions = UserTransaction::where('user_id', $dependentId)
-                                ->where('transaction_type_id', $savingTransactionType)
                                 ->where('created_at', 'like', $currentMonth . '%')
+                                ->where('transaction_type_id', $savingTransactionType)
+                                ->whereNotNull('savings_id')
                                 ->get();
     
         foreach ($savingsTransactions as $savingTransaction) {
