@@ -121,109 +121,15 @@ class AnalyticController extends Controller
 
         $currentMonth = $request->input('current_month') ?? now()->format('Y-m');
 
-        // fetch the dependent user
-        $dependent = User::find($dependentId);
+        $result = AnalyticService::budgetAnalysis($dependentId, $currentMonth);
 
-        // check if the dependent exists and has the role 'dependant'
-        if ($dependent && $dependent->hasRole('dependant')) {
-            // fetch total monthly income for the current month
-            $income = $dependent->getTotalIncome($currentMonth);
-        } else {
-            return response()->json(['error' => 'Dependent not found or not a dependant'], 404);
-        }
-
-        if ($income == 0) {
+        if (is_array($result)) {
             return response()->json([
-                'code' => 404,
-                'message' => 'No income found for the current month'
-            ], 404);
+                'code' => 200,
+                'data' => $result
+            ]);
         }
-
-        // define the budget rule
-        $selectedRule = '50/30/20';
-        $budget = $this->rules[$selectedRule];
-
-        // fetch transactions for the current month
-        $transactions = UserTransaction::where('user_id', $dependentId)
-                            ->where('created_at', 'like', $currentMonth . '%')
-                            ->whereNotNull('merchant_id')
-                            ->get();
-
-        if (isEmpty($transactions)) {
-            return response()->json([
-                'code' => 404,
-                'message' => 'No transaction found for the current month'
-            ], 404);
-        }
-
-        // categorize transactions
-        $spending = [
-            'needs' => 0,
-            'wants' => 0,
-            'savings' => 0,
-        ];
-
-        foreach ($transactions as $transaction) {
-            $merchantType = $transaction->merchant->type->name;
-            $mappedType = $this->merchantTypeMappings[$merchantType] ?? 'others';
     
-            switch ($mappedType) {
-                case 'needs':
-                    $spending['needs'] += $transaction->amount;
-                    break;
-                case 'wants':
-                    $spending['wants'] += $transaction->amount;
-                    break;
-                case 'savings':
-                    $spending['savings'] += $transaction->amount;
-                    break;
-            }
-        }
-
-        // fetch savings for the current month
-        $savingTransactionType = TransactionService::getTransactionTypeIdBySlug("add-to-savings");
-        $savingsTransactions = UserTransaction::where('user_id', $dependentId)
-                                ->where('created_at', 'like', $currentMonth . '%')
-                                ->where('transaction_type_id', $savingTransactionType)
-                                ->whereNotNull('savings_id')
-                                ->get();
-    
-        foreach ($savingsTransactions as $savingTransaction) {
-            $spending['savings'] += $savingTransaction->amount;
-        }
-
-        // calculate budget limits
-        $limits = [
-            'needs' => $income * $budget['needs'],
-            'wants' => $income * $budget['wants'],
-            'savings' => $income * $budget['savings'],
-        ];
-
-        // analyze spending
-        $analysis = [
-            'needs' => $spending['needs'] <= $limits['needs'] ? 'within budget' : 'over budget',
-            'wants' => $spending['wants'] <= $limits['wants'] ? 'within budget' : 'over budget',
-            'savings' => $spending['savings'] >= $limits['savings'] ? 'within target' : 'below target',
-        ];
-
-        // provide recommendations
-        $recommendations = [];
-        if ($spending['needs'] > $limits['needs']) {
-            $recommendations[] = 'Reduce spending on essential expenses.';
-        }
-        if ($spending['wants'] > $limits['wants']) {
-            $recommendations[] = 'Limit discretionary spending.';
-        }
-        if ($spending['savings'] < $limits['savings']) {
-            $recommendations[] = 'Increase savings or investments.';
-        }
-
-        return response()->json([
-            'income' => $income,
-            'spending' => $spending,
-            'limits' => $limits,
-            'analysis' => $analysis,
-            'recommendations' => $recommendations,
-        ]);
+        return $result;
     }
 }
