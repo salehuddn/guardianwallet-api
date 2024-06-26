@@ -23,10 +23,17 @@ class AnalyticController extends Controller
         ],
     ];
 
-    // public function index ()
-    // {
-    //     $analyze = self::analyze($dependantId;
-    // }
+    protected $merchantTypeMappings = [
+        'Food' => 'needs',
+        'Transportation' => 'needs',
+        'Utility' => 'needs',
+        'Entertainment' => 'wants',
+        'Health' => 'needs',
+        'Education' => 'needs',
+        'Retail' => 'wants',
+        'Service' => 'needs',
+        'Others' => 'wants',
+    ];
 
     public function analyze(Request $request)
     {

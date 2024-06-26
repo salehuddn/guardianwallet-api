@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
@@ -73,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany(UserTransaction::class);
     }
 
+    public function savings()
+    {
+        return $this->hasMany(Savings::class);
+    }
+
     public function setSpendingLimit($limit)
     {
         $this->spending_limit = $limit;
@@ -109,7 +115,10 @@ class User extends Authenticatable
         $query = $this->transactions()->where('transaction_type_id', 4);
 
         if ($date) {
-            $query->whereDate('created_at', $date);
+            $startOfMonth = Carbon::parse($date)->startOfMonth();
+            $endOfMonth = Carbon::parse($date)->endOfMonth();
+
+            $query->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
         }
 
         return $query->sum('amount');

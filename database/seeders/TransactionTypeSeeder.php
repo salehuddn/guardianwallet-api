@@ -26,6 +26,18 @@ class TransactionTypeSeeder extends Seeder
                 'name' => 'Make Payment',
                 'slug' => 'make-payment',
             ],
+            [
+                'name' => 'Receive Fund',
+                'slug' => 'receive-fund',
+            ],
+            [
+                'name' => 'Add to Savings',
+                'slug' => 'add-to-savings',
+            ],
+            [
+                'name' => 'Withdraw from Savings',
+                'slug' => 'withdraw-from-savings',
+            ],
         ];
 
         foreach ($transactionTypes as $transactionType) {

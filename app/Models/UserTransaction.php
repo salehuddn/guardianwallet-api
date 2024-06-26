@@ -14,6 +14,7 @@ class UserTransaction extends Model
     protected $fillable = [
         'user_id',
         'merchant_id',
+        'savings_id',
         'transaction_type_id',
         'reference',
         'narration',
@@ -46,5 +47,10 @@ class UserTransaction extends Model
     public function merchant()
     {
         return $this->belongsTo(Merchant::class);
+    }
+
+    public function savings()
+    {
+        return $this->belongsTo(Savings::class);
     }
 }

@@ -83,6 +83,14 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
         Route::get('transaction-history', [DependantController::class, 'transactionHistory']);
         Route::post('scan-qr', [DependantController::class, 'scanQr']);
         Route::post('transfer-fund', [DependantController::class, 'transferFund']);
+
+        Route::prefix('savings')->group(function () {
+            Route::post('create', [DependantController::class, 'createSavingFund']);
+            Route::put('update/{id}', [DependantController::class, 'updateSavingFund']);
+            Route::delete('delete/{id}', [DependantController::class, 'deleteSavingFund']);
+            Route::post('transfer', [DependantController::class, 'transferToSavingFund']);
+            Route::post('withdraw', [DependantController::class, 'withdrawFromSavingFund']);
+        });
     });
 
     //analytics
