@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\UserTransaction;
 use App\Services\AnalyticService;
+use App\Services\TransactionService;
 
 class AnalyticController extends Controller
 {
