@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('savings', function (Blueprint $table) {
+        Schema::create('savings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('name');
-            $table->decimal('goal_amount', 15, 2);
-            $table->decimal('amount', 15, 2);
-            $table->decimal('remaining', 15, 2);
+            $table->decimal('goal_amount', 15, 2)->default(0.00);
+            $table->decimal('amount', 15, 2)->default(0.00);
+            $table->decimal('remaining', 15, 2)->default(0.00);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -29,8 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('savings', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('savings');
     }
 };
