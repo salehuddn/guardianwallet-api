@@ -156,7 +156,7 @@ class DependantController extends Controller
 
         // check user spending limit
         $limitCheckResult = SpendingService::checkLimit($user, $data['amount']);
-        if ($limitCheckResult) {
+        if ($limitCheckResult && $limitCheckResult['code'] === 200) {
             // send notification to dependant & guardian
             $title = 'Spending Limit Alert';
             $user->notify(new SpendingLimitNotification(
