@@ -343,6 +343,10 @@ class DependantController extends Controller
         }
 
         try {
+            // move money to wallet
+            if ($savingFund->amount > 0) {
+                $user->wallet->increment('balance', $savingFund->amount);
+            }
             $savingFund->delete();
 
             return response()->json([
