@@ -22,7 +22,7 @@ class Savings extends Model
         parent::boot();
 
         static::creating(function ($saving) {
-            $saving->amount = $saving->goal_amount;
+            $saving->remaining = $saving->goal_amount;
         });
     }
 
