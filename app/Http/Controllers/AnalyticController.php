@@ -10,6 +10,19 @@ use App\Services\AnalyticService;
 
 class AnalyticController extends Controller
 {
+    protected $rules = [
+        '50/30/20' => [
+            'needs' => 0.50,
+            'wants' => 0.30,
+            'savings' => 0.20,
+        ],
+        '70/20/10' => [
+            'needs' => 0.70,
+            'wants' => 0.20,
+            'savings' => 0.10,
+        ],
+    ];
+
     // public function index ()
     // {
     //     $analyze = self::analyze($dependantId;
@@ -86,5 +99,89 @@ class AnalyticController extends Controller
         }
 
         return response()->json($analytics);
+    }
+
+    public function budgetAnalysis($dependentId)
+    {
+        $currentMonth = now()->format('Y-m');
+        
+        // fetch total monthly income
+        $dependent = User::find($dependentId);
+
+        // check if the dependent exists and has the role 'dependant'
+        if ($dependent && $dependent->hasRole('dependant')) {
+            // fetch total monthly income for the current month
+            $income = $dependent->getTotalIncome($currentMonth);
+        } else {
+            // handle the case where the user does not exist or is not a dependant
+            $income = 0;
+        }
+        
+        if ($income == 0) {
+            return response()->json(['error' => 'No income found for the current month'], 404);
+        }
+
+        $selectedRule = '50/30/20';
+        $budget = $this->rules[$selectedRule];
+
+        // fetch transactions for the current month
+        $transactions = UserTransaction::where('user_id', $dependentId)
+                            ->where('created_at', 'like', $currentMonth . '%')
+                            ->get();
+
+        // categorize transactions
+        $spending = [
+            'needs' => 0,
+            'wants' => 0,
+            'savings' => 0,
+        ];
+
+        foreach ($transactions as $transaction) {
+            switch ($transaction->type) {
+                case 'needs':
+                    $spending['needs'] += $transaction->amount;
+                    break;
+                case 'wants':
+                    $spending['wants'] += $transaction->amount;
+                    break;
+                case 'savings':
+                    $spending['savings'] += $transaction->amount;
+                    break;
+            }
+        }
+
+        // calculate budget limits
+        $limits = [
+            'needs' => $income * $budget['needs'],
+            'wants' => $income * $budget['wants'],
+            'savings' => $income * $budget['savings'],
+        ];
+
+        // analyze spending
+        $analysis = [
+            'needs' => $spending['needs'] <= $limits['needs'] ? 'within budget' : 'over budget',
+            'wants' => $spending['wants'] <= $limits['wants'] ? 'within budget' : 'over budget',
+            'savings' => $spending['savings'] >= $limits['savings'] ? 'within target' : 'below target',
+        ];
+
+        // provide recommendations
+        $recommendations = [];
+        if ($spending['needs'] > $limits['needs']) {
+            $recommendations[] = 'Reduce spending on essential expenses.';
+        }
+        if ($spending['wants'] > $limits['wants']) {
+            $recommendations[] = 'Limit discretionary spending.';
+        }
+        if ($spending['savings'] < $limits['savings']) {
+            $recommendations[] = 'Increase savings or investments.';
+        }
+
+        return response()->json([
+            'income' => $income,
+            'spending' => $spending,
+            'limits' => $limits,
+            'analysis' => $analysis,
+            'recommendations' => $recommendations,
+        ]);
     }
 }

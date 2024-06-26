@@ -95,4 +95,23 @@ class User extends Authenticatable
             ]);
         });
     }
+
+    public function getTotalIncome($date = null)
+    {
+        if (!$this->hasRole('dependant')) {
+            return 0;
+        }
+
+        /**
+         * Transaction Type (ID)
+         * 4 - Receive Fund
+         */
+        $query = $this->transactions()->where('transaction_type_id', 4);
+
+        if ($date) {
+            $query->whereDate('created_at', $date);
+        }
+
+        return $query->sum('amount');
+    }
 }

@@ -49,6 +49,7 @@ Route::prefix('v1/public')->group(function () {
 
     Route::prefix('analytic')->group(function () {
         Route::get('/', [AnalyticController::class, 'analyze']);
+        Route::get('budget/{dependentId}', [AnalyticController::class, 'budgetAnalysis']);
     });
 });
 
