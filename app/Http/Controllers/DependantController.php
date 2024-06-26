@@ -155,6 +155,14 @@ class DependantController extends Controller
             ], 404);
         }
 
+        // check if the user has a wallet and if the wallet balance is sufficient
+        if (!$user->wallet || $user->wallet->balance == 0.00 || $user->wallet->balance < $data['amount']) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Amount is higher than wallet balance or wallet is empty'
+            ], 400);
+        }
+
         // check user spending limit
         $limitCheckResult = SpendingService::checkLimit($user, $data['amount']);
         if ($limitCheckResult && $limitCheckResult['code'] === 200) {

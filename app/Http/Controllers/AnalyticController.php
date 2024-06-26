@@ -141,6 +141,7 @@ class AnalyticController extends Controller
         // fetch transactions for the current month
         $transactions = UserTransaction::where('user_id', $dependentId)
                             ->where('created_at', 'like', $currentMonth . '%')
+                            ->whereNotNull('merchant_id')
                             ->get();
 
         // categorize transactions
@@ -151,7 +152,10 @@ class AnalyticController extends Controller
         ];
 
         foreach ($transactions as $transaction) {
-            switch ($transaction->type) {
+            $merchantType = $transaction->merchant->type->name;
+            $mappedType = $this->merchantTypeMappings[$merchantType] ?? 'others';
+    
+            switch ($mappedType) {
                 case 'needs':
                     $spending['needs'] += $transaction->amount;
                     break;
