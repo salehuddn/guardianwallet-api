@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserTransaction extends Model
 {
@@ -30,7 +31,7 @@ class UserTransaction extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->reference = uniqid();
+            $model->reference = Str::random(20);
         });
     }
 
