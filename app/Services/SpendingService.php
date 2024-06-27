@@ -62,6 +62,8 @@ class SpendingService
 
     // calculate the total amount spent by user within the current week
     $totalSpentThisWeek = $user->transactions()
+        ->where('transaction_type_id', TransactionService::getTransactionTypeIdBySlug("transfer-fund"))
+        ->whereNotNull('merchant_id')
         ->where('created_at', '>=', $startOfWeek)
         ->where('created_at', '<=', $endOfWeek)
         ->where('status', 'success')
