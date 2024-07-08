@@ -146,8 +146,8 @@ class GuardianController extends Controller
     public function topupWallet(Request $request)
     {
         Stripe::setApiKey(config('stripe.sk'));
-        // $user = $request->user();
-        $user = User::find(2);
+        $user = $request->user();
+        // $user = User::find(2);
 
         if (!$request->filled('amount')) {
             return response()->json([
