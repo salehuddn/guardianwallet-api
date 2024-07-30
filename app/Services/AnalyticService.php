@@ -39,7 +39,7 @@ class AnalyticService
         'Others' => 'wants',
     ];
 
-    public static function monthlySummary ($dependentId) 
+    public static function monthlySummary($dependentId)
     {
         $currentMonth = now()->format('Y-m');
         $totalSpending = UserTransaction::where('user_id', $dependentId)
@@ -140,7 +140,7 @@ class AnalyticService
         return $spendingByMerchant;
     }
 
-    public static function budgetAnalysis($dependentId, $currentMonth)
+     public static function budgetAnalysis($dependentId, $currentMonth)
     {
         // fetch the dependent user
         $dependent = User::find($dependentId);
@@ -233,13 +233,21 @@ class AnalyticService
         // provide recommendations
         $recommendations = [];
         if ($spending['needs'] > $limits['needs']) {
-            $recommendations[] = 'Reduce spending on essential expenses.';
+            $recommendations[] = 'Reduce spending on essential expenses. Consider shopping around for better prices, using coupons, and avoiding impulse purchases.';
+        } else {
+            $recommendations[] = 'Great job keeping your essential expenses within budget! Keep up the good work and continue to prioritize necessary spending.';
         }
+
         if ($spending['wants'] > $limits['wants']) {
-            $recommendations[] = 'Limit discretionary spending.';
+            $recommendations[] = 'Limit discretionary spending. Identify areas where you can cut back, such as dining out, entertainment, and non-essential shopping.';
+        } else {
+            $recommendations[] = 'Well done on managing your discretionary spending! Treat yourself occasionally, but continue to monitor and control your wants to stay within budget.';
         }
+
         if ($spending['savings'] < $limits['savings']) {
-            $recommendations[] = 'Increase savings or investments.';
+            $recommendations[] = 'Increase savings or investments. Look for ways to save more, such as setting up automatic transfers to your savings account and reducing unnecessary expenses.';
+        } else {
+            $recommendations[] = 'Excellent job meeting your savings target! Keep up the habit of saving regularly, and consider exploring investment opportunities to grow your savings.';
         }
 
         // percentages

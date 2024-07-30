@@ -5,6 +5,7 @@ namespace App\Services;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Services\TransactionService;
+use App\Notifications\SpendingLimitNotification;
 
 class SpendingService
 {
@@ -79,5 +80,21 @@ class SpendingService
 
     return null;
   }
+
+  public static function notifySavingGoalReached(User $user)
+    {
+        // Get all saving funds for the user
+        $savings = $user->savings;
+
+        foreach ($savings as $saving) {
+            if ($saving->goal_amount != 0 && $saving->amount >= $saving->goal_amount) {
+                // Notify the user
+                $user->notify(new SpendingLimitNotification(
+                    'Saving Goal Reached',
+                    'Congratulations! Your saving fund "' . $saving->name . '" has reached its goal of ' . $saving->goal_amount . '.'
+                ));
+            }
+        }
+    }
 
 }

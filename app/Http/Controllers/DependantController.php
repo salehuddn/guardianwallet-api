@@ -302,11 +302,10 @@ class DependantController extends Controller
             ],
             'goal_amount' => 'nullable|numeric|min:0'
         ]);
-    
+
         $goalAmount = $data['goal_amount'] ?? 0.00;
 
         try {
-
             if ($savingFund->amount != 0.00) {
                 $remainingAmount = $goalAmount - $savingFund->amount;
             } else {
@@ -314,10 +313,13 @@ class DependantController extends Controller
             }
 
             $savingFund->update([
-                'name' => $data['name'] ,
+                'name' => $data['name'],
                 'goal_amount' => $goalAmount,
                 'remaining_amount' => $remainingAmount,
             ]);
+
+            // Check and notify if saving goal is reached
+            SpendingService::notifySavingGoalReached($user);
 
             return response()->json([
                 'code' => 200,
@@ -332,6 +334,7 @@ class DependantController extends Controller
             ], 500);
         }
     }
+
 
     public function deleteSavingFund(Request $request, $id)
     {
@@ -370,7 +373,7 @@ class DependantController extends Controller
         }
     }
 
-    public function transferToSavingFund (Request $request)
+    public function transferToSavingFund(Request $request)
     {
         $user = $request->user();
         $authResponse = $this->authenticate($user, 'dependant');
@@ -425,12 +428,16 @@ class DependantController extends Controller
             'completed_at' => now()
         ]);
 
+        // Check and notify if saving goal is reached
+        SpendingService::notifySavingGoalReached($user);
+
         return response()->json([
             'code' => '200',
             'message' => 'Fund transferred successfully',
             'transaction' => $transaction
         ], 200);
     }
+
 
     public function withdrawFromSavingFund(Request $request)
     {
