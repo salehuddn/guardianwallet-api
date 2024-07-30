@@ -298,7 +298,7 @@ class DependantController extends Controller
                 'string',
                 Rule::unique('savings')->where(function ($query) use ($request) {
                     return $query->where('user_id', $request->user()->id);
-                }),
+                })->ignore($id),
             ],
             'goal_amount' => 'nullable|numeric|min:0'
         ]);

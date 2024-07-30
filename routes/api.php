@@ -86,7 +86,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1/secured')->group(function () {
 
         Route::prefix('savings')->group(function () {
             Route::post('create', [DependantController::class, 'createSavingFund']);
-            Route::put('update/{savingId}', [DependantController::class, 'updateSavingFund']);
+            Route::post('update/{savingId}', [DependantController::class, 'updateSavingFund']);
             Route::delete('delete/{dependantId}', [DependantController::class, 'deleteSavingFund']);
             Route::post('transfer', [DependantController::class, 'transferToSavingFund']);
             Route::post('withdraw', [DependantController::class, 'withdrawFromSavingFund']);
