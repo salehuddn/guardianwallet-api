@@ -140,7 +140,7 @@ class AnalyticService
         return $spendingByMerchant;
     }
 
-     public static function budgetAnalysis($dependentId, $currentMonth)
+    public static function budgetAnalysis($dependentId, $currentMonth)
     {
         // fetch the dependent user
         $dependent = User::find($dependentId);
