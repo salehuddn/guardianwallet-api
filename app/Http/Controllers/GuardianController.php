@@ -95,7 +95,7 @@ class GuardianController extends Controller
                     'phone' => $dependant->phone,
                     'wallet' => $dependant->wallet->balance,
                     'spending_limit' => $dependant->spending_limit ?? '0.00',
-                    'transaction_history' => $dependant->transactions()->with('transactionType')->latest()->get(),
+                    'transaction_history' => $dependant->transactions()->with('transactionType', 'merchant.type', 'savings')->latest()->get(),
                 ];
             }),
         ], 200);
