@@ -83,7 +83,7 @@ class DependantController extends Controller
         $user = $request->user();
 
         if ($user->hasRole('dependant')) {
-            $transactions = $user->transactions()->with('transactionType')->latest()->get();
+            $transactions = $user->transactions()->with(['transactionType', 'merchant.type'])->latest()->get();
 
             return response()->json([
                 'code' => 200,
